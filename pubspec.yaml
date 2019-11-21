@@ -1,0 +1,12 @@
+name: gladstoriesengine
+description: The library for the Glad Stories Engine
+author: Dmytro Gladkyi <gladimdim@gmail.com>
+homepage: https://github.com/gladimdim/gladstoriesdart
+
+version: 0.1.0
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  rxdart: ^0.22.3
