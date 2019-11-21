@@ -122,7 +122,7 @@ class Story {
     });
   }
 
-  static Story fromJson(String input) {
+  static Story fromJson(String input, {ImageResolver imageResolver}) {
     Map map = jsonDecode(input);
     var rootMap = map["root"];
     var rootPage = Page.fromMap(rootMap);
@@ -138,6 +138,7 @@ class Story {
       authors: authors,
       year: map["year"],
       currentPage: currentPage,
+      imageResolver: imageResolver,
       history: historyList == null
           ? []
           : historyList.map((item) => HistoryItem.fromMap(item)).toList(),
