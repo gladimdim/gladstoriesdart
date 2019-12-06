@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:test/test.dart';
 import 'package:gladstoriesengine/gladstoriesengine.dart';
 
@@ -15,7 +17,7 @@ void main() {
     test("Inits the root page", () {
       expect(story.root != null, equals(true));
     });
-    test("Inits the current page page", () {
+    test("Inits the current page", () {
       expect(story.root, equals(story.currentPage));
     });
     test("Inits the history list", () {
@@ -95,6 +97,62 @@ void main() {
 
     test("Inits history from history argument", () {
       expect(story.history[0].text, equals("Test Node"));
+    });
+  });
+
+  group("Story API. ", () {
+    var story = Story(
+      authors: "Authors",
+      title: "Title",
+      description: "Test Description",
+      year: 1648,
+      root: Page(
+        nodes: [PageNode(text: "Test"), PageNode(text: "Second")],
+        next: [
+          PageNext(
+            text: "Go to next page",
+            nextPage: Page(
+              nodes: [
+                PageNode(text: "inner node"),
+              ],
+            ),
+          ),
+        ],
+      ),
+      history: [HistoryItem(imagePath: [], text: "Test Node")],
+    );
+
+    test("Can jump to next node if present", () {
+      expect(story.history.length, equals(1));
+      story.doContinue();
+      expect(story.history.length, equals(2));
+    });
+
+    test("Cannot continue when at the end", () {
+      expect(story.canContinue(), equals(false));
+      // expect(story.history.length, equals(3));
+    });
+
+    test("Cannot continue when at the end", () {
+      expect(story.doContinue, throwsA(CannotContinue));
+    });
+
+    test("Can go to next page by name. Adds next text and the first node to history", () {
+      story.goToNextPage(story.currentPage.next[0]);
+      expect(story.history.length, equals(4));
+      expect(story.history[3].text, equals("inner node"));
+      expect(story.history[2].text, equals("Go to next page"));
+    });
+
+    test("Can find parent Page of the child page by reference", () {
+      expect(story.findParentOfPage(story.currentPage), equals(story.root));
+    });
+
+    test("Can reset the story state back to the beginning of the story", () {
+      story.reset();
+      expect(story.history.length, equals(1));
+      expect(story.currentPage, equals(story.root));
+      expect(story.currentPage.currentIndex, equals(0));
     });
   });
 }

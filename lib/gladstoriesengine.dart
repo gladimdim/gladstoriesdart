@@ -88,7 +88,7 @@ class Story {
       currentPage.nextNode();
       _logCurrentPassageToHistory();
     } else {
-      throw "End of next options";
+      throw CannotContinue;
     }
   }
 
@@ -470,4 +470,8 @@ String imageTypeToString(ImageType imageType) {
     default:
       return null;
   }
+}
+
+class CannotContinue implements Exception {
+  
 }
