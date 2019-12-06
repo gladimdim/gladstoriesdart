@@ -10,3 +10,4 @@ environment:
 
 dependencies:
   rxdart: ^0.22.3
+  test: ^1.9.4

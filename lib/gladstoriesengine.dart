@@ -19,7 +19,7 @@ class Story {
   String authors;
   int year;
   Page root;
-  List<HistoryItem> history = [];
+  List<HistoryItem> history;
   Page currentPage;
   ImageResolver imageResolver;
 
@@ -37,6 +37,9 @@ class Story {
       this.imageResolver}) {
     if (this.currentPage == null) {
       currentPage = root;
+    }
+    if (this.history == null) {
+      history = [];
     }
     historyChanges = _streamHistory.stream;
     if (history.isEmpty) {
@@ -56,15 +59,17 @@ class Story {
       return;
     }
     if (currentPage.getCurrentNode().imageType != null) {
-      var backgroundImage = imageResolver(
-          currentPage.getCurrentNode().imageType);
+      List<String> imagePaths = [];
+      if (imageResolver != null) {
+        var backgroundImage =
+            imageResolver(currentPage.getCurrentNode().imageType);
+        imagePaths.add(backgroundImage.getImagePathColored());
+        imagePaths.add(backgroundImage.getImagePath());
+      }
       history.add(
         HistoryItem(
           text: currentPage.getCurrentText(),
-          imagePath: [
-            backgroundImage.getImagePathColored(),
-            backgroundImage.getImagePath()
-          ],
+          imagePath: imagePaths,
         ),
       );
     } else {
@@ -127,6 +132,7 @@ class Story {
     var rootMap = map["root"];
     var rootPage = Page.fromMap(rootMap);
     var currentPageMap = map["currentPage"];
+    print(currentPageMap);
     var currentPage =
         currentPageMap == null ? null : Page.fromMap(map["currentPage"]);
     List historyList = map["history"];
@@ -308,6 +314,9 @@ class Page {
   }
 
   static Page fromMap(Map<String, dynamic> map) {
+    if (map.isEmpty || map == null) {
+      return Page();
+    }
     List next = map["next"];
     List<PageNext> parsedNext = List.from(next.map((n) => PageNext.fromMap(n)));
     List nodes = map["nodes"];
@@ -417,7 +426,6 @@ class PageNode {
   }
 }
 
-
 ImageType imageTypeFromString(String input) {
   switch (input) {
     case "forest":
@@ -443,14 +451,23 @@ ImageType imageTypeFromString(String input) {
 
 String imageTypeToString(ImageType imageType) {
   switch (imageType) {
-    case ImageType.FOREST: return "forest";
-    case ImageType.BOAT: return 'boat';
-    case ImageType.BULRUSH: return 'bulrush';
-    case ImageType.CAMP: return 'camp';
-    case ImageType.COSSACKS: return 'cossacks';
-    case ImageType.RIVER: return 'river';
-    case ImageType.LANDING: return 'landing';
-    case ImageType.STEPPE: return 'steppe';
-    default: return null;
+    case ImageType.FOREST:
+      return "forest";
+    case ImageType.BOAT:
+      return 'boat';
+    case ImageType.BULRUSH:
+      return 'bulrush';
+    case ImageType.CAMP:
+      return 'camp';
+    case ImageType.COSSACKS:
+      return 'cossacks';
+    case ImageType.RIVER:
+      return 'river';
+    case ImageType.LANDING:
+      return 'landing';
+    case ImageType.STEPPE:
+      return 'steppe';
+    default:
+      return null;
   }
 }
