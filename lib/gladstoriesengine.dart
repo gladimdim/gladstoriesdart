@@ -132,7 +132,6 @@ class Story {
     var rootMap = map["root"];
     var rootPage = Page.fromMap(rootMap);
     var currentPageMap = map["currentPage"];
-    print(currentPageMap);
     var currentPage =
         currentPageMap == null ? null : Page.fromMap(map["currentPage"]);
     List historyList = map["history"];
