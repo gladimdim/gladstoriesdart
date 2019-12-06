@@ -1,5 +1,5 @@
 name: gladstoriesengine
-description: The library for the Glad Stories Engine
+description: The library for the Glad Stories Engine. This is an interactive fiction engine which can be used for editing and running your stories. Supports all platforms. Pure dart implementation.
 author: Dmytro Gladkyi <gladimdim@gmail.com>
 homepage: https://github.com/gladimdim/gladstoriesdart
 
@@ -9,5 +9,5 @@ environment:
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
-  rxdart: ^0.22.3
+  rxdart: ^0.22.6
   test: ^1.9.4
