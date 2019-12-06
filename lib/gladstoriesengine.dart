@@ -442,8 +442,6 @@ ImageType imageTypeFromString(String input) {
       return ImageType.CAMP;
     case 'cossacks':
       return ImageType.COSSACKS;
-    case 'camp':
-      return ImageType.CAMP;
     default:
       return null;
   }
