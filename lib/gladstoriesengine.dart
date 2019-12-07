@@ -469,6 +469,4 @@ String imageTypeToString(ImageType imageType) {
   }
 }
 
-class CannotContinue implements Exception {
-  
-}
+class CannotContinue implements Exception {}

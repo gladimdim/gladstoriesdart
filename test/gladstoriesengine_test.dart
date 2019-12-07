@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:test/test.dart';
 import 'package:gladstoriesengine/gladstoriesengine.dart';
 
@@ -137,7 +135,9 @@ void main() {
       expect(story.doContinue, throwsA(CannotContinue));
     });
 
-    test("Can go to next page by name. Adds next text and the first node to history", () {
+    test(
+        "Can go to next page by name. Adds next text and the first node to history",
+        () {
       story.goToNextPage(story.currentPage.next[0]);
       expect(story.history.length, equals(4));
       expect(story.history[3].text, equals("inner node"));

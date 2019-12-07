@@ -1,3 +1,8 @@
+# 0.1.3
+
+- Added example.
+- Formatted the dart files.
+
 # 0.1.2
 
 Fixed issues in Story constructor.

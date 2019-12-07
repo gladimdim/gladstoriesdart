@@ -2,7 +2,7 @@
 
 ## Home Page: https://github.com/gladimdim/GladStoriesEngine
 
-# How to run Tests
+# How to run Tests with coverage
 
 - Install coverage https://pub.dev/packages/coverage:
 
