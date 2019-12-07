@@ -3,7 +3,7 @@ description: The library for the Glad Stories Engine. This is an interactive fic
 author: Dmytro Gladkyi <gladimdim@gmail.com>
 homepage: https://github.com/gladimdim/gladstoriesdart
 
-version: 0.1.1
+version: 0.1.2
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
