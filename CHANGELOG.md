@@ -1,3 +1,10 @@
+# 0.2.0
+
+- Added type annotations for several methods.
+- Improved test coverage to 75%.
+- Page.hasNext logic is moved to Page.hasNextNode.
+- Page.hasNext now returns true/false depending on emptiness of next list.
+
 # 0.1.3
 
 - Added example.

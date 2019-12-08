@@ -120,12 +120,8 @@ void main() {
       history: [HistoryItem(imagePath: [], text: "Test Node")],
     );
 
-    test(
-        "Can jump to next node if present and logs it to the historyChanges stream.",
-        () {
+    test("Can jump to next node if present.", () async {
       expect(story.history.length, equals(1));
-      expect(story.historyChanges,
-          emits([HistoryItem(text: "Test"), HistoryItem(text: "Second")]));
       story.doContinue();
       expect(story.history.length, equals(2));
     });
@@ -183,6 +179,44 @@ void main() {
       expect(story.history.length, equals(1));
       expect(story.currentPage, equals(story.root));
       expect(story.currentPage.currentIndex, equals(0));
+    });
+  });
+
+  group("Page tests", () {
+    var page = Page(nodes: [
+      PageNode(
+        text: "First",
+        imageType: ImageType.BOAT,
+      ),
+      PageNode(
+        text: "Second",
+      ),
+    ], next: [
+      PageNext(
+        text: "Next Options",
+        nextPage: Page(),
+      ),
+    ]);
+
+    test("Can get current node", () {
+      expect(page.getCurrentNode().text, equals("First"));
+    });
+
+    test("Can get current text from the current node", () {
+      expect(page.getCurrentText(), equals("First"));
+    });
+
+    test("Can tell if next node is present", () {
+      expect(page.hasNextNode(), isTrue);
+    });
+
+    test("Can tell if the next options are available", () {
+      expect(page.hasNext(), isTrue);
+    });
+
+    test("Can proceed to next node", () {
+      page.nextNode();
+      expect(page.hasNextNode(), isFalse);
     });
   });
 }

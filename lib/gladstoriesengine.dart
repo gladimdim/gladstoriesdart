@@ -102,7 +102,7 @@ class Story {
   }
 
   bool canContinue() {
-    return currentPage.hasNext();
+    return currentPage.hasNextNode();
   }
 
   String toJson() {
@@ -229,8 +229,12 @@ class Page {
     return nodes.elementAt(currentIndex);
   }
 
-  bool hasNext() {
+  bool hasNextNode() {
     return currentIndex + 1 < nodes.length;
+  }
+
+  bool hasNext() {
+    return next.isNotEmpty;
   }
 
   String getCurrentText() {
