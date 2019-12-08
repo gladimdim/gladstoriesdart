@@ -105,7 +105,7 @@ class Story {
     return currentPage.hasNext();
   }
 
-  toJson() {
+  String toJson() {
     return jsonEncode({
       "title": title,
       "description": description,
@@ -115,7 +115,7 @@ class Story {
     });
   }
 
-  toStateJson() {
+  String toStateJson() {
     return jsonEncode({
       "title": title,
       "description": description,

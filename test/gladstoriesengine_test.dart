@@ -10,10 +10,10 @@ void main() {
       expect(story.title, equals("After the Battle"));
     });
     test("Inits the description", () {
-      expect(story.description != null, equals(true));
+      expect(story.description != null, isTrue);
     });
     test("Inits the root page", () {
-      expect(story.root != null, equals(true));
+      expect(story.root != null, isTrue);
     });
     test("Inits the current page", () {
       expect(story.root, equals(story.currentPage));
@@ -44,7 +44,7 @@ void main() {
       expect(story.description, equals("Test Description"));
     });
     test("Inits the root page", () {
-      expect(story.root != null, equals(true));
+      expect(story.root != null, isTrue);
     });
     test("Inits the current page page", () {
       expect(story.root, equals(story.currentPage));
@@ -71,7 +71,7 @@ void main() {
     );
 
     test("Inits with non-empty history array if page is not empty", () {
-      expect(story.history.isNotEmpty, equals(true));
+      expect(story.history.isNotEmpty, isTrue);
     });
 
     test("Inits history with the first node from Page", () {
@@ -90,7 +90,7 @@ void main() {
     );
 
     test("Inits with history argument if it is present", () {
-      expect(story.history.isNotEmpty, equals(true));
+      expect(story.history.isNotEmpty, isTrue);
     });
 
     test("Inits history from history argument", () {
@@ -120,15 +120,19 @@ void main() {
       history: [HistoryItem(imagePath: [], text: "Test Node")],
     );
 
-    test("Can jump to next node if present", () {
+    test(
+        "Can jump to next node if present and logs it to the historyChanges stream.",
+        () {
       expect(story.history.length, equals(1));
+      expect(story.historyChanges,
+          emits([HistoryItem(text: "Test"), HistoryItem(text: "Second")]));
       story.doContinue();
       expect(story.history.length, equals(2));
     });
 
     test("Cannot continue when at the end", () {
-      expect(story.canContinue(), equals(false));
-      // expect(story.history.length, equals(3));
+      expect(story.canContinue(), isFalse);
+      expect(story.history.length, equals(2));
     });
 
     test("Cannot continue when at the end", () {
@@ -146,6 +150,32 @@ void main() {
 
     test("Can find parent Page of the child page by reference", () {
       expect(story.findParentOfPage(story.currentPage), equals(story.root));
+    });
+
+    test(
+        "Can convert itself to json string and initialize from that string back.",
+        () {
+      String json = story.toJson();
+      expect(json.contains("year"), isTrue);
+      expect(json.contains("title"), isTrue);
+      expect(json.contains("description"), isTrue);
+      expect(json.contains("history"), isFalse);
+      var storyFromJson = Story.fromJson(json);
+      expect(storyFromJson.title, equals("Title"));
+      expect(storyFromJson.currentPage, equals(storyFromJson.root));
+    });
+
+    test(
+        "Can convert itself to json with state and initialize from that string back",
+        () {
+      String jsonWithState = story.toStateJson();
+      expect(jsonWithState.contains("history"), isTrue);
+      expect(jsonWithState.contains("currentPage"), isTrue);
+
+      var storyFromStateJson = Story.fromJson(jsonWithState);
+      expect(storyFromStateJson.history.length, equals(4));
+      expect(
+          storyFromStateJson.root == storyFromStateJson.currentPage, isFalse);
     });
 
     test("Can reset the story state back to the beginning of the story", () {
