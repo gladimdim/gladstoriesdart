@@ -35,12 +35,16 @@ class Story {
       this.history,
       this.year,
       this.imageResolver}) {
+    if (root == null) {
+      root = Page(nodes: []);
+    }
     if (this.currentPage == null) {
       currentPage = root;
     }
     if (this.history == null) {
       history = [];
     }
+
     historyChanges = _streamHistory.stream;
     if (history.isEmpty) {
       _logCurrentPassageToHistory();

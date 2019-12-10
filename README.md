@@ -22,4 +22,4 @@ brew install lcov
 ./scripts/generate_coverage.sh
 ```
 
-- View the LCOV report with any tool
+- View the LCOV report at ./coverage/index.html

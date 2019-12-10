@@ -1,3 +1,7 @@
+# 0.2.1
+
+- Fixed issue when story could not be initialized without parameters.
+
 # 0.2.0
 
 - Added type annotations for several methods.

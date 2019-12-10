@@ -9,6 +9,12 @@ void main() {
     test("Inits the title", () {
       expect(story.title, equals("After the Battle"));
     });
+
+    test("Can init without parameters", () {
+      var story = Story();
+      expect(story.currentPage, isNotNull);
+      expect(story.root, isNotNull);
+    });
     test("Inits the description", () {
       expect(story.description != null, isTrue);
     });
