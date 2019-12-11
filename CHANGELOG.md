@@ -1,3 +1,7 @@
+# 0.2.2
+
+- Removed accidentally added file.
+
 # 0.2.1
 
 - Fixed issue when story could not be initialized without parameters.
