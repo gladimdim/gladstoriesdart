@@ -1,6 +1,10 @@
 # A Dart Implementation of runtime and editor of Interactive Fiction Story format GladStoriesEngine
 
-## Home Page: https://github.com/gladimdim/GladStoriesEngine
+## Interactive Fiction Engine Home Page: https://github.com/gladimdim/GladStoriesEngine
+
+# Examples
+
+Go to ./examples/ and check the dart source code there. It has a lot of comments.
 
 # How to run Tests with coverage
 
