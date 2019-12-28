@@ -201,17 +201,17 @@ class Story {
     Map map = jsonDecode(input);
     var rootMap = map["root"];
     var rootPage = Page.fromMap(rootMap);
-    var currentPageMap = map["currentPage"];
+    var currentPageMap = map['currentPage'];
     var currentPage =
-        currentPageMap == null ? null : Page.fromMap(map["currentPage"]);
-    List historyList = map["history"];
+        currentPageMap == null ? null : Page.fromMap(map['currentPage']);
+    List historyList = map['history'];
     String authors = map["authors"];
     return Story(
-      title: map["title"],
-      description: map["description"],
+      title: map['title'],
+      description: map['description'],
       root: rootPage,
       authors: authors,
-      year: map["year"],
+      year: map['year'],
       currentPage: currentPage,
       imageResolver: imageResolver,
       history: historyList == null
@@ -223,10 +223,10 @@ class Story {
   /// Generates dummy story just to get started.
   static generate() {
     var story = Story(
-      title: "After the battle",
+      title: 'After the battle',
       description:
-          "At the beginning of XVII century a confrontation flares up between Polish-Lithuanian Commonwealth and Ottoman Empire. As a result of a devastating defeat in the Battle of Cecora, a lot of noblemen, cossacks and soldiers perished or were captured by Turks and Tatars. A fate of a young cossack, wayfaring through the Wild FIelds in a desperate attempt to escape from captivity, depends on a reader of this interactive fiction. All challenges are equally hard: survive in a steppe, avoid the revenge of Tatars, win the trust of cossack fishermen and return home. But the time of the final battle that will change history is coming. Will the main character be able to participate in it and stay alive and where his life will go from there - only You know the answer.",
-      authors: "Konstantin Boytsov, Anastasiia Tsapenko",
+          'At the beginning of XVII century a confrontation flares up between Polish-Lithuanian Commonwealth and Ottoman Empire. As a result of a devastating defeat in the Battle of Cecora, a lot of noblemen, cossacks and soldiers perished or were captured by Turks and Tatars. A fate of a young cossack, wayfaring through the Wild FIelds in a desperate attempt to escape from captivity, depends on a reader of this interactive fiction. All challenges are equally hard: survive in a steppe, avoid the revenge of Tatars, win the trust of cossack fishermen and return home. But the time of the final battle that will change history is coming. Will the main character be able to participate in it and stay alive and where his life will go from there - only You know the answer.',
+      authors: 'Konstantin Boytsov, Anastasiia Tsapenko',
       root: Page.generate(),
       year: 1620,
     );
@@ -398,8 +398,8 @@ class Page {
   /// Used to deserialize Page from the json string.
   static Page fromJSON(String input) {
     var map = jsonDecode(input);
-    List next = map["next"];
-    List nodes = map["nodes"];
+    List next = map['next'];
+    List nodes = map['nodes'];
 
     return Page(
       next: next.map((n) => PageNext.fromMap(n)).toList(),
@@ -438,15 +438,15 @@ class Page {
     if (map.isEmpty || map == null) {
       return Page();
     }
-    List next = map["next"];
+    List next = map['next'];
     List<PageNext> parsedNext = List.from(next.map((n) => PageNext.fromMap(n)));
-    List nodes = map["nodes"];
+    List nodes = map['nodes'];
     List<PageNode> parsedNodes =
         List.from(nodes.map((n) => PageNode.fromMap(n)));
-    int currentI = map["currentIndex"];
+    int currentI = map['currentIndex'];
     return Page(
       next: parsedNext,
-      endType: endTypeFromString(map["endType"]),
+      endType: endTypeFromString(map['endType']),
       nodes: parsedNodes,
       currentIndex: currentI == null ? 0 : currentI,
     );
@@ -455,10 +455,10 @@ class Page {
   /// Used to generate dummy Page.
   static Page generate() {
     var p1 = PageNode(
-      text: "This is an example of passage text",
+      text: 'This is an example of passage text',
     );
     var p2 = PageNode(
-      text: "This is second passage",
+      text: 'This is second passage',
     );
 
     return Page(
@@ -466,11 +466,11 @@ class Page {
         endType: EndType.ALIVE,
         next: [
           PageNext(
-            text: "Option 1",
+            text: 'Option 1',
             nextPage: Page(),
           ),
           PageNext(
-            text: "Option 2",
+            text: 'Option 2',
             nextPage: Page(),
           )
         ]);
@@ -484,13 +484,13 @@ class PageNext {
   PageNext({this.text, this.nextPage});
 
   static fromMap(Map<String, dynamic> map) {
-    return PageNext(text: map["text"], nextPage: Page.fromMap(map["nextPage"]));
+    return PageNext(text: map['text'], nextPage: Page.fromMap(map['nextPage']));
   }
 
   Map toMap() {
     return {
-      "text": text,
-      "nextPage": nextPage.toMap(),
+      'text': text,
+      'nextPage': nextPage.toMap(),
     };
   }
 }
@@ -500,9 +500,9 @@ enum EndType { DEAD, ALIVE }
 String endTypeToString(EndType endType) {
   switch (endType) {
     case EndType.ALIVE:
-      return "ALIVE";
+      return 'ALIVE';
     case EndType.DEAD:
-      return "DEAD";
+      return 'DEAD';
     default:
       return null;
   }
@@ -510,9 +510,9 @@ String endTypeToString(EndType endType) {
 
 EndType endTypeFromString(String input) {
   switch (input) {
-    case "ALIVE":
+    case 'ALIVE':
       return EndType.ALIVE;
-    case "DEAD":
+    case 'DEAD':
       return EndType.DEAD;
     default:
       return null;
@@ -528,33 +528,33 @@ class PageNode {
   static fromJSON(String input) {
     var map = jsonDecode(input);
     return PageNode(
-      imageType: imageTypeFromString(map["imageType"]),
-      text: map["text"],
+      imageType: imageTypeFromString(map['imageType']),
+      text: map['text'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "text": text,
-      "imageType": imageTypeToString(imageType),
+      'text': text,
+      'imageType': imageTypeToString(imageType),
     };
   }
 
   static fromMap(Map<String, dynamic> map) {
     return PageNode(
-      imageType: imageTypeFromString(map["imageType"]),
-      text: map["text"],
+      imageType: imageTypeFromString(map['imageType']),
+      text: map['text'],
     );
   }
 }
 
 ImageType imageTypeFromString(String input) {
   switch (input) {
-    case "forest":
+    case 'forest':
       return ImageType.FOREST;
-    case "bulrush":
+    case 'bulrush':
       return ImageType.BULRUSH;
-    case "boat":
+    case 'boat':
       return ImageType.BOAT;
     case "river":
       return ImageType.RIVER;
