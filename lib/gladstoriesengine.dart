@@ -4,26 +4,77 @@ import 'dart:convert';
 
 import 'package:rxdart/rxdart.dart';
 
+/// Contains supported by the Loca Deserta Image Types of the Page Nodes.
 enum ImageType { BOAT, STEPPE, FOREST, BULRUSH, RIVER, LANDING, CAMP, COSSACKS }
 
+/// Used to generate image paths on the real device for the ImageType.
+///
+/// The ImageType is provided in the constructor.
+/// This abstract class is used by the ImageResolver functional typedef.
 abstract class HistoryImage {
+  /// Must return colored image based on the ImageType.
   String getImagePathColored();
+
+  /// Must return black&white image based on the ImageType.
   String getImagePath();
 }
 
+/// Used to resolve the ImageType to the real path on the device to the image
 typedef ImageResolver = HistoryImage Function(ImageType type);
 
+/// The main class for the GladStoriesEngine.
+///
+/// Contains everything needed to create, update, save, restore the interactive fiction.
+/// The Story instance has the necessary metadata of the book saved in the instance propertires.
 class Story {
+  /// The title of the book
   String title;
+
+  /// The description of the book
   String description;
+
+  /// The list of authors separated by the comma
   String authors;
+
+  /// The year in which the interactive fiction story took place
   int year;
+
+  /// The starting Page of the interactive Story.
+  ///
+  /// This can be mutated only when the Story is used in editor mode.
+  /// In all other cases it must be immutable.
   Page root;
+
+  /// List of the nodes and choices already done by the player.
+  ///
+  /// Usually contains just text but can also include nodes with images.
   List<HistoryItem> history;
+
+  /// The current Page of the Story.
+  ///
+  /// When Story is just started then the root Page and the currentPage are identical.
+  /// When player reads the Story, the currentPage is referenced to the current page.
+  /// When player makes a choice and goes to choice page, then the currentPage is reassigned
+  /// to the nextPage.
+  /// When player starts Story from the beginning by calling:
+  /// ```dart
+  /// story.reset();
+  /// ```
+  /// Then the currentPage is reassigned to the root page.
   Page currentPage;
+
+  /// A reference to the function to transform ImageType from enum into real image paths on the device.
   ImageResolver imageResolver;
 
-  BehaviorSubject _streamHistory = BehaviorSubject<List<HistoryItem>>();
+  final BehaviorSubject _streamHistory = BehaviorSubject<List<HistoryItem>>();
+
+  /// A stream with the full list of history.
+  ///
+  /// New values are pushed to the stream when user presses Continue or makes a choice.
+  /// By default, once the Story is started the stream will contains the very first node
+  /// from the first page.
+  /// This stream can be used by Flutter StreamBuilder widget to react to the Story changes.
+  /// The stream contains all the necessary info to update and build the Story view.
   Stream historyChanges;
 
   Story(
@@ -35,22 +86,22 @@ class Story {
       this.history,
       this.year,
       this.imageResolver}) {
-    if (root == null) {
-      root = Page(nodes: []);
-    }
-    if (this.currentPage == null) {
-      currentPage = root;
-    }
-    if (this.history == null) {
-      history = [];
-    }
+    root ??= Page(nodes: []);
+    currentPage ??= root;
+    history ??= [];
 
     historyChanges = _streamHistory.stream;
+    // if the Story was just opened then add the very first node from current page to the history.
     if (history.isEmpty) {
       _logCurrentPassageToHistory();
     }
   }
 
+  /// Makes the read Story to be unread again.
+  ///
+  /// Use this method when player wants to start reading the Story from the beginning.
+  /// Resets currentPage to point back to the root page.
+  /// Resets current node count to point to the first node in the Page.
   void reset() {
     history = [];
     currentPage = root;
@@ -58,7 +109,7 @@ class Story {
     _logCurrentPassageToHistory();
   }
 
-  _logCurrentPassageToHistory() {
+  void _logCurrentPassageToHistory() {
     if (currentPage.nodes.isEmpty) {
       return;
     }
@@ -87,7 +138,13 @@ class Story {
     _streamHistory.sink.add(history);
   }
 
-  doContinue() {
+  /// Jump to the next node (passage) on the current page.
+  ///
+  /// Throws an exception CannotContinue when the current page has no next nodes.
+  /// This means that either the book has ended and the consumer of this API must
+  /// check story.currentPage.isTheEnd or the player must be presented with the list of
+  /// next choices to be selected.
+  void doContinue() {
     if (canContinue()) {
       currentPage.nextNode();
       _logCurrentPassageToHistory();
@@ -96,7 +153,8 @@ class Story {
     }
   }
 
-  goToNextPage(PageNext next) {
+  /// Used to jump to the next page based on the Player's choice.
+  void goToNextPage(PageNext next) {
     history.add(
       HistoryItem(text: next.text),
     );
@@ -105,32 +163,40 @@ class Story {
     _logCurrentPassageToHistory();
   }
 
+  /// Checks whether the currentPage has the next node.
   bool canContinue() {
     return currentPage.hasNextNode();
   }
 
+  /// Serializes the Story without the state and currentPage to the Map.
+  ///
+  /// Used to persist the Story.
   String toJson() {
     return jsonEncode({
-      "title": title,
-      "description": description,
-      "authors": authors,
-      "root": root.toMap(),
-      "year": year,
+      'title': title,
+      'description': description,
+      'authors': authors,
+      'root': root.toMap(),
+      'year': year,
     });
   }
 
+  /// Serializes the Story with the state, history and the currentPage to the Map.
+  ///
+  /// Used to persist the Story with saved player's progress.
   String toStateJson() {
     return jsonEncode({
-      "title": title,
-      "description": description,
-      "authors": authors,
-      "root": root.toMap(),
-      "currentPage": currentPage.toStateMap(),
-      "year": year,
-      "history": history.map((historyItem) => historyItem.toMap()).toList(),
+      'title': title,
+      'description': description,
+      'authors': authors,
+      'root': root.toMap(),
+      'currentPage': currentPage.toStateMap(),
+      'year': year,
+      'history': history.map((historyItem) => historyItem.toMap()).toList(),
     });
   }
 
+  /// Initializes the story from the input json.
   static Story fromJson(String input, {ImageResolver imageResolver}) {
     Map map = jsonDecode(input);
     var rootMap = map["root"];
@@ -154,6 +220,7 @@ class Story {
     );
   }
 
+  /// Generates dummy story just to get started.
   static generate() {
     var story = Story(
       title: "After the battle",
@@ -166,6 +233,10 @@ class Story {
     return story;
   }
 
+  /// Finds the parent page of the provided page.
+  ///
+  /// Does a tree breadth first search to find the parent of the page.
+  /// This is used to be able to navigate in the page hierarchy.
   Page findParentOfPage(Page page) {
     var queue = Queue<Page>();
     queue.add(root);
@@ -186,38 +257,54 @@ class Story {
 }
 
 class HistoryItem {
+  /// Text to be shown to the user.
   final String text;
+
+  /// Images to be shown to the user.
+  ///
+  /// Can be empty.
   final List<String> imagePath;
 
   HistoryItem({this.text, this.imagePath});
 
-  toMap() {
+  /// Used to serialize to the map for persisting data.
+  Map toMap() {
     return {
-      "text": text,
-      "imagePath": imagePath,
+      'text': text,
+      'imagePath': imagePath,
     };
   }
 
   static HistoryItem fromMap(Map map) {
-    List listFromMap = map["imagePath"];
+    List listFromMap = map['imagePath'] as List;
     List<String> imagePaths = listFromMap == null
         ? null
         : listFromMap.map((item) => "$item").toList();
     return HistoryItem(
-      text: map["text"],
+      text: map['text'] as String,
       imagePath: imagePaths,
     );
   }
 }
 
 class Page {
+  /// List of the passages of the page.
+  ///
+  /// Player has to press "Continue" button in order to jump to the next node on the page.
   List<PageNode> nodes;
+
+  /// Pointer to the current node.
   int currentIndex;
 
+  /// The reference to the Page from which user can get to this page.
   Page parent;
 
+  /// List of next choices which are shown to user.
+  ///
+  /// Contains the text + reference to the next page.
   List<PageNext> next;
 
+  /// Is not null if the Page is the end of the story.
   EndType endType;
 
   Page({this.nodes, this.currentIndex = 0, this.next, this.endType}) {
@@ -233,64 +320,82 @@ class Page {
     return nodes.elementAt(currentIndex);
   }
 
+  /// Returns true if there are more nodes.
   bool hasNextNode() {
     return currentIndex + 1 < nodes.length;
   }
 
+  /// Returns true if there are choices on the page.
   bool hasNext() {
     return next.isNotEmpty;
   }
 
+  /// Returns text of the current node.
   String getCurrentText() {
     return getCurrentNode().text;
   }
 
+  /// Add a new node (paragraph) to the current page.
+  ///
+  ///
+  /// This is used by the Editor of the interactive fiction story.
+  /// Should not be used in the 'reading' mode (when player reads the book).
   void addNodeWithText(String text) {
     var node = PageNode(text: text);
     nodes.add(node);
   }
 
+  /// Used by the Editor to remove the node at specific index.
   void removeNodeAtIndex(int i) {
     nodes.removeAt(i);
   }
 
+  /// Used by the Editor to remove the node by reference.
   void removeNode(PageNode node) {
     nodes.remove(node);
   }
 
+  /// Used by the Editor to insert new node at specific index.
   void addNodeWithTextAtIndex(String text, int index) {
     var node = PageNode(text: text);
     nodes.insert(index, node);
   }
 
-  changeParent(Page page) {
+  /// Used to reassign page to another place in the Story.
+  void changeParent(Page page) {
     parent = page;
   }
 
-  isRoot() {
+  /// Returns true if the page does not have parents.
+  bool isRoot() {
     return parent == null;
   }
 
-  isTheEnd() {
+  /// Used to notify the Player that the Story has ended.
+  bool isTheEnd() {
     return endType != null;
   }
 
+  /// Used by the Editor to navigate to the next node.
   void nextNode() {
     currentIndex++;
     if (currentIndex >= nodes.length) {
-      throw "End of nodes for current page";
+      throw 'End of nodes for current page';
     }
   }
 
+  /// Used by the Editor to add choice with next page.
   void addNextPageWithText(String text) {
     var page = Page();
     next.add(PageNext(text: text, nextPage: page));
   }
 
+  /// Used by the Editor to remove choice with the page.
   void removeNextPage(PageNext page) {
     next.remove(page);
   }
 
+  /// Used to deserialize Page from the json string.
   static Page fromJSON(String input) {
     var map = jsonDecode(input);
     List next = map["next"];
@@ -303,23 +408,32 @@ class Page {
     );
   }
 
+  /// Used to serialize Page instance to map for persistence.
+  ///
+  /// Does not save the state of the Page.
   Map<String, dynamic> toMap() {
     return {
-      "endType": endTypeToString(endType),
-      "next": next.map((n) => n.toMap()).toList(),
-      "nodes": nodes.map((n) => n.toMap()).toList(),
+      'endType': endTypeToString(endType),
+      'next': next.map((n) => n.toMap()).toList(),
+      'nodes': nodes.map((n) => n.toMap()).toList(),
     };
   }
 
+  /// Used to serialize Page instance with state to map for persistence.
+  ///
+  /// Saves the player's state of the Page.
   Map<String, dynamic> toStateMap() {
     return {
-      "endType": endTypeToString(endType),
-      "next": next.map((n) => n.toMap()).toList(),
+      'endType': endTypeToString(endType),
+      'next': next.map((n) => n.toMap()).toList(),
       "nodes": nodes.map((n) => n.toMap()).toList(),
       "currentIndex": currentIndex,
     };
   }
 
+  /// Used to deserialize from the map into Page instance.
+  ///
+  /// If the state was present, it will be restored too.
   static Page fromMap(Map<String, dynamic> map) {
     if (map.isEmpty || map == null) {
       return Page();
@@ -338,6 +452,7 @@ class Page {
     );
   }
 
+  /// Used to generate dummy Page.
   static Page generate() {
     var p1 = PageNode(
       text: "This is an example of passage text",
@@ -372,7 +487,7 @@ class PageNext {
     return PageNext(text: map["text"], nextPage: Page.fromMap(map["nextPage"]));
   }
 
-  toMap() {
+  Map toMap() {
     return {
       "text": text,
       "nextPage": nextPage.toMap(),

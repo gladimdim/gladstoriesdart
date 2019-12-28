@@ -1,3 +1,8 @@
+# 0.2.3
+- Added DartDocs.
+- Fixed various linter issues.
+- No functional changes.
+
 # 0.2.2
 
 - Removed accidentally added file.

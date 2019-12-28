@@ -15,3 +15,4 @@ pubspec.lock
 doc/api/
 .vscode
 coverage
+lib/main.dart
