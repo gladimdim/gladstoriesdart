@@ -1,17 +1,31 @@
-import 'package:test/test.dart';
 import 'package:gladstoriesengine/gladstoriesengine.dart';
+import 'package:test/test.dart';
 
+class TestImage extends HistoryImage {
+  @override
+  String getImagePath() {
+    return "1";
+  }
+
+  @override
+  String getImagePathColored() {
+    return "2";
+  }
+}
+
+var image = TestImage();
+HistoryImage getRandomImage(ImageType type) => image;
 void main() {
   var gladStory =
       '{"title":"After the Battle","description":"At the beginning of the XVII century...","authors":"Dmytro Gladkyi, Someone else","year":1648,"root":{"endType":null,"nodes":[{"text":"Dmytro lay hidden in the thicket far from the water","imageType":"river"},{"text":"The Cossack lay like this for a long time."}],"next":[{"text":"Shoot the rifle","nextPage":{}},{"text":"Run away","nextPage":{}}]}}';
   group("Can be initialized from json", () {
-    var story = Story.fromJson(gladStory);
+    var story = Story.fromJson(gladStory, imageResolver: getRandomImage);
     test("Inits the title", () {
       expect(story.title, equals("After the Battle"));
     });
 
     test("Can init without parameters", () {
-      var story = Story();
+      var story = Story(imageResolver: getRandomImage);
       expect(story.currentPage, isNotNull);
       expect(story.root, isNotNull);
     });
@@ -41,6 +55,7 @@ void main() {
         title: "Title",
         description: "Test Description",
         year: 1648,
+        imageResolver: getRandomImage,
         root: Page());
 
     test("Inits the title", () {
@@ -72,6 +87,7 @@ void main() {
       title: "Title",
       description: "Test Description",
       year: 1648,
+      imageResolver: getRandomImage,
       root: Page(nodes: [PageNode(text: "Test")]),
       // history: [HistoryItem(imagePath: [], text: "Test")],
     );
@@ -91,6 +107,7 @@ void main() {
       title: "Title",
       description: "Test Description",
       year: 1648,
+      imageResolver: getRandomImage,
       root: Page(nodes: [PageNode(text: "Test")]),
       history: [HistoryItem(imagePath: [], text: "Test Node")],
     );
@@ -124,6 +141,7 @@ void main() {
         ],
       ),
       history: [HistoryItem(imagePath: [], text: "Test Node")],
+      imageResolver: getRandomImage,
     );
 
     test("Can jump to next node if present.", () async {
@@ -162,7 +180,7 @@ void main() {
       expect(json.contains("title"), isTrue);
       expect(json.contains("description"), isTrue);
       expect(json.contains("history"), isFalse);
-      var storyFromJson = Story.fromJson(json);
+      var storyFromJson = Story.fromJson(json, imageResolver: getRandomImage);
       expect(storyFromJson.title, equals("Title"));
       expect(storyFromJson.currentPage, equals(storyFromJson.root));
     });
@@ -174,7 +192,8 @@ void main() {
       expect(jsonWithState.contains("history"), isTrue);
       expect(jsonWithState.contains("currentPage"), isTrue);
 
-      var storyFromStateJson = Story.fromJson(jsonWithState);
+      var storyFromStateJson =
+          Story.fromJson(jsonWithState, imageResolver: getRandomImage);
       expect(storyFromStateJson.history.length, equals(4));
       expect(
           storyFromStateJson.root == storyFromStateJson.currentPage, isFalse);

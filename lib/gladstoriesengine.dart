@@ -85,7 +85,8 @@ class Story {
       this.currentPage,
       this.history,
       this.year,
-      this.imageResolver}) {
+      this.imageResolver})
+      : assert(imageResolver != null) {
     root ??= Page(nodes: []);
     currentPage ??= root;
     history ??= [];

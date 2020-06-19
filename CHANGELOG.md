@@ -1,3 +1,6 @@
+# 0.2.4
+- Made imageResolver a required field in the constructor.
+
 # 0.2.3
 - Added DartDocs.
 - Fixed various linter issues.
