@@ -241,7 +241,19 @@ void main() {
 
     test("Can proceed to next node", () {
       page.nextNode();
+      expect(page.getCurrentText(), equals("Second"));
       expect(page.hasNextNode(), isFalse);
+    });
+    test("Can return to previous node", () {
+      page.previousNode();
+      expect(page.hasNextNode(), isTrue);
+      expect(page.getCurrentText(), equals("First"));
+    });
+
+    test("Can remove current node", () {
+      page.deleteCurrentNode();
+      expect(page.hasNextNode(), isFalse);
+      expect(page.getCurrentText(), equals("Second"));
     });
   });
 }

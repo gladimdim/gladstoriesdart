@@ -1,3 +1,6 @@
+# 0.2.5
+- Added new API methods.
+
 # 0.2.4
 - Made imageResolver a required field in the constructor.
 

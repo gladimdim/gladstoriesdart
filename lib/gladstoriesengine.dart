@@ -385,6 +385,35 @@ class Page {
     }
   }
 
+  /// Deletes nodes at current index
+  void deleteCurrentNode() {
+    deleteNodeAt(currentIndex);
+    currentIndex--;
+    normalizeIndex();
+  }
+
+  /// deletes node at given index.
+  void deleteNodeAt(index) {
+    nodes.removeAt(index);
+    normalizeIndex();
+  }
+
+  /// puts current index back into range of nodes list values.
+  void normalizeIndex() {
+    if (currentIndex < 0) {
+      currentIndex = 0;
+    } else if (currentIndex >= nodes.length) {
+      currentIndex = nodes.length - 1;
+    }
+  }
+
+  /// Used to go to the previous node
+  void previousNode() {
+    if (currentIndex > 0) {
+      currentIndex--;
+    }
+  }
+
   /// Used by the Editor to add choice with next page.
   void addNextPageWithText(String text) {
     var page = Page();
