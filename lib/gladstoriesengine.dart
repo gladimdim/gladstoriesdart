@@ -253,6 +253,10 @@ class Story {
     return null;
   }
 
+  /// Converts the story into MarkdownDocument
+  ///
+  /// MarkdownDocument is a wrapper around string that helps to generate valid MD file.
+  /// The story must contain history (it has to be started first).
   MarkdownDocument convertToMarkDown() {
     MarkdownDocument doc = MarkdownDocument();
     history.forEach((element) {
@@ -266,6 +270,7 @@ class Story {
     return doc;
   }
 
+  /// Converts Story into valid markdown string.
   String toMarkdownString() {
     return convertToMarkDown().toString();
   }
