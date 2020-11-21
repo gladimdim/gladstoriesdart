@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:gladstoriesengine/markdown_generator.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Contains supported by the Loca Deserta Image Types of the Page Nodes.
@@ -250,6 +251,23 @@ class Story {
       }
     }
     return null;
+  }
+
+  MarkdownDocument convertToMarkDown() {
+    MarkdownDocument doc = MarkdownDocument();
+    history.forEach((element) {
+      doc.separator();
+      doc.text(element.text);
+      if (element.imagePath != null) {
+        doc.separator();
+        doc.image(element.imagePath[0]);
+      }
+    });
+    return doc;
+  }
+
+  String toMarkdownString() {
+    return convertToMarkDown().toString();
   }
 
   dispose() {
