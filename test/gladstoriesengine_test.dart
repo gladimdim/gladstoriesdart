@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:gladstoriesengine/gladstoriesengine.dart';
 import 'package:test/test.dart';
 
@@ -16,8 +18,9 @@ class TestImage extends HistoryImage {
 var image = TestImage();
 HistoryImage getRandomImage(ImageType type) => image;
 void main() {
-  var gladStory =
+  var gladStoryString =
       '{"title":"After the Battle","description":"At the beginning of the XVII century...","authors":"Dmytro Gladkyi, Someone else","year":1648,"root":{"endType":null,"nodes":[{"text":"Dmytro lay hidden in the thicket far from the water","imageType":"river"},{"text":"The Cossack lay like this for a long time."}],"next":[{"text":"Shoot the rifle","nextPage":{}},{"text":"Run away","nextPage":{}}]}}';
+  var gladStory = jsonDecode(gladStoryString);
   group("Can be initialized from json", () {
     var story = Story.fromJson(gladStory, imageResolver: getRandomImage);
     test("Inits the title", () {
@@ -175,11 +178,11 @@ void main() {
     test(
         "Can convert itself to json string and initialize from that string back.",
         () {
-      String json = story.toJson();
-      expect(json.contains("year"), isTrue);
-      expect(json.contains("title"), isTrue);
-      expect(json.contains("description"), isTrue);
-      expect(json.contains("history"), isFalse);
+      Map json = story.toJson();
+      expect(json["year"], story.year);
+      expect(json["title"], story.title);
+      expect(json["description"], story.description);
+      expect(json["history"], isNull);
       var storyFromJson = Story.fromJson(json, imageResolver: getRandomImage);
       expect(storyFromJson.title, equals("Title"));
       expect(storyFromJson.currentPage, equals(storyFromJson.root));
@@ -188,9 +191,9 @@ void main() {
     test(
         "Can convert itself to json with state and initialize from that string back",
         () {
-      String jsonWithState = story.toStateJson();
-      expect(jsonWithState.contains("history"), isTrue);
-      expect(jsonWithState.contains("currentPage"), isTrue);
+      Map jsonWithState = story.toStateJson();
+      expect(jsonWithState["history"].length, equals(4));
+      expect(jsonWithState["currentPage"], isNotNull);
 
       var storyFromStateJson =
           Story.fromJson(jsonWithState, imageResolver: getRandomImage);

@@ -86,8 +86,7 @@ class Story {
       this.currentPage,
       this.history,
       this.year,
-      this.imageResolver})
-      : assert(imageResolver != null) {
+      this.imageResolver}) {
     root ??= Page(nodes: []);
     currentPage ??= root;
     history ??= [];
@@ -173,21 +172,21 @@ class Story {
   /// Serializes the Story without the state and currentPage to the Map.
   ///
   /// Used to persist the Story.
-  String toJson() {
-    return jsonEncode({
+  Map<String, dynamic> toJson() {
+    return {
       'title': title,
       'description': description,
       'authors': authors,
       'root': root.toMap(),
       'year': year,
-    });
+    };
   }
 
   /// Serializes the Story with the state, history and the currentPage to the Map.
   ///
   /// Used to persist the Story with saved player's progress.
-  String toStateJson() {
-    return jsonEncode({
+  Map<String, dynamic> toStateJson() {
+    return {
       'title': title,
       'description': description,
       'authors': authors,
@@ -195,12 +194,13 @@ class Story {
       'currentPage': currentPage.toStateMap(),
       'year': year,
       'history': history.map((historyItem) => historyItem.toMap()).toList(),
-    });
+    };
   }
 
   /// Initializes the story from the input json.
-  static Story fromJson(String input, {ImageResolver imageResolver}) {
-    Map map = jsonDecode(input);
+  static Story fromJson(Map<String, dynamic> input,
+      {ImageResolver imageResolver}) {
+    Map map = input;
     var rootMap = map["root"];
     var rootPage = Page.fromMap(rootMap);
     var currentPageMap = map['currentPage'];
@@ -259,6 +259,9 @@ class Story {
   /// The story must contain history (it has to be started first).
   MarkdownDocument convertToMarkDown() {
     MarkdownDocument doc = MarkdownDocument();
+    doc.h1(title);
+    doc.h2(description);
+    doc.h2(authors);
     history.forEach((element) {
       doc.separator();
       doc.text(element.text);
