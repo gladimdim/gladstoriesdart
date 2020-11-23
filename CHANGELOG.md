@@ -1,5 +1,21 @@
 # 0.2.5
 - Added new API methods.
+- toJson method was refactored and now returns a Map<String, dynamic> instead of String.
+- fromJson method was refactored and now expected Map<String, dynamic> instead of String.
+- convertToMarkDown converts history of the Story into the Markdown document.
+- toMarkdownString returns a Markdown string with images, meta data. Can be used for embedding into sites.
+
+Engine no longer uses jsonEncode/jsonDecode when working with toJson/fromJson methods. It is up to users of the API to convert strings to/from JSON.
+
+Example
+Before:
+```
+Story.fromJson("SOME JSON STRING");
+```
+After:
+```
+Story.fromJson(jsonEncode("SOME JSON STRING"));
+```
 
 # 0.2.4
 - Made imageResolver a required field in the constructor.
