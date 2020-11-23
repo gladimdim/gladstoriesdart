@@ -198,10 +198,9 @@ class Story {
   }
 
   /// Initializes the story from the input json.
-  static Story fromJson(Map<String, dynamic> input,
+  static Story fromJson(Map<String, dynamic> map,
       {ImageResolver imageResolver}) {
-    Map map = input;
-    var rootMap = map["root"];
+    var rootMap = map["root"] as Map<String, dynamic>;
     var rootPage = Page.fromMap(rootMap);
     var currentPageMap = map['currentPage'];
     var currentPage =
@@ -223,7 +222,7 @@ class Story {
   }
 
   /// Generates dummy story just to get started.
-  static generate() {
+  static Story generate() {
     var story = Story(
       title: 'After the battle',
       description:
@@ -494,16 +493,15 @@ class Page {
     if (map.isEmpty || map == null) {
       return Page();
     }
-    List next = map['next'];
-    List<PageNext> parsedNext = List.from(next.map((n) => PageNext.fromMap(n)));
-    List nodes = map['nodes'];
-    List<PageNode> parsedNodes =
-        List.from(nodes.map((n) => PageNode.fromMap(n)));
+    List next = map['next'] as List;
+    List parsedNext = next.map<PageNext>((n) => PageNext.fromMap(n)).toList();
+    List nodes = map['nodes'] as List;
+    List parsedNodes = nodes.map<PageNode>((n) => PageNode.fromMap(n)).toList();
     int currentI = map['currentIndex'];
     return Page(
       next: parsedNext,
       endType: endTypeFromString(map['endType']),
-      nodes: parsedNodes,
+      nodes: parsedNodes as List<PageNode>,
       currentIndex: currentI == null ? 0 : currentI,
     );
   }
@@ -539,11 +537,11 @@ class PageNext {
 
   PageNext({this.text, this.nextPage});
 
-  static fromMap(Map<String, dynamic> map) {
+  static PageNext fromMap(Map<String, dynamic> map) {
     return PageNext(text: map['text'], nextPage: Page.fromMap(map['nextPage']));
   }
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'text': text,
       'nextPage': nextPage.toMap(),
@@ -581,7 +579,7 @@ class PageNode {
 
   PageNode({this.imageType, this.text});
 
-  static fromJSON(String input) {
+  static PageNode fromJSON(String input) {
     var map = jsonDecode(input);
     return PageNode(
       imageType: imageTypeFromString(map['imageType']),
@@ -596,7 +594,7 @@ class PageNode {
     };
   }
 
-  static fromMap(Map<String, dynamic> map) {
+  static PageNode fromMap(Map<String, dynamic> map) {
     return PageNode(
       imageType: imageTypeFromString(map['imageType']),
       text: map['text'],

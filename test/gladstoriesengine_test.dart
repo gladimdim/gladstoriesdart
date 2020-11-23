@@ -178,7 +178,7 @@ void main() {
     test(
         "Can convert itself to json string and initialize from that string back.",
         () {
-      Map json = story.toJson();
+      var json = story.toJson();
       expect(json["year"], story.year);
       expect(json["title"], story.title);
       expect(json["description"], story.description);
@@ -191,7 +191,7 @@ void main() {
     test(
         "Can convert itself to json with state and initialize from that string back",
         () {
-      Map jsonWithState = story.toStateJson();
+      var jsonWithState = story.toStateJson();
       expect(jsonWithState["history"].length, equals(4));
       expect(jsonWithState["currentPage"], isNotNull);
 
