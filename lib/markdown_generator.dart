@@ -1,7 +1,9 @@
 class MarkdownDocument {
+  final String imagePrefix;
+
   String _document = '';
 
-  MarkdownDocument([document]) {
+  MarkdownDocument(this.imagePrefix, [document]) {
     if (document != null) {
       _document = document;
     }
@@ -30,8 +32,7 @@ class MarkdownDocument {
   MarkdownDocument image(String imagePath,
       [String imageText, bool showText = false]) {
     imageText = imageText ?? '';
-    _document = _document +
-        '![${imageText}](https://locadeserta.com/game/assets/${imagePath})';
+    _document = _document + '![${imageText}]($imagePrefix/${imagePath})';
     if (showText) {
       _document = _document + ' ${imageText}';
     }

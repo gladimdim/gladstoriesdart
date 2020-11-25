@@ -141,6 +141,14 @@ void main() {
               ],
             ),
           ),
+          PageNext(
+            text: "Go to second page",
+            nextPage: Page(
+              nodes: [
+                PageNode(text: "second page"),
+              ],
+            ),
+          ),
         ],
       ),
       history: [HistoryItem(imagePath: [], text: "Test Node")],
@@ -163,7 +171,7 @@ void main() {
     });
 
     test(
-        "Can go to next page by name. Adds next text and the first node to history",
+        "Can go to next page by reference. Adds next text and the first node to history",
         () {
       story.goToNextPage(story.currentPage.next[0]);
       expect(story.history.length, equals(4));
@@ -207,6 +215,21 @@ void main() {
       expect(story.history.length, equals(1));
       expect(story.currentPage, equals(story.root));
       expect(story.currentPage.currentIndex, equals(0));
+    });
+
+    test("Can list next option texts", () {
+      var options = story.currentPage.getNextNodeTexts();
+      expect(options.length, equals(2));
+      expect(options.first, equals("Go to next page"));
+      expect(options[1], equals("Go to second page"));
+    });
+
+    test("Can go to next page by its option text", () {
+      var options = story.currentPage.getNextNodeTexts();
+      story.goToNextPageByText(options[1]);
+      expect(story.history.length, equals(3));
+      expect(story.history[2].text, equals("second page"));
+      expect(story.history[1].text, equals("Go to second page"));
     });
   });
 

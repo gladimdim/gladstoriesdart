@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:gladstoriesengine/background_image.dart';
 import 'package:gladstoriesengine/markdown_generator.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -65,6 +66,7 @@ class Story {
   Page currentPage;
 
   /// A reference to the function to transform ImageType from enum into real image paths on the device.
+  /// By default the Story constructor will use BackgroundImage class included in this library.
   ImageResolver imageResolver;
 
   final BehaviorSubject _streamHistory = BehaviorSubject<List<HistoryItem>>();
@@ -90,6 +92,7 @@ class Story {
     root ??= Page(nodes: []);
     currentPage ??= root;
     history ??= [];
+    imageResolver ??= BackgroundImage.getRandomImageForType;
 
     historyChanges = _streamHistory.stream;
     // if the Story was just opened then add the very first node from current page to the history.
@@ -162,6 +165,12 @@ class Story {
     currentPage = next.nextPage;
     currentPage.currentIndex = 0;
     _logCurrentPassageToHistory();
+  }
+
+  void goToNextPageByText(String optionText) {
+    var nextPage =
+        currentPage.next.firstWhere((element) => element.text == optionText);
+    goToNextPage(nextPage);
   }
 
   /// Checks whether the currentPage has the next node.
@@ -256,8 +265,9 @@ class Story {
   ///
   /// MarkdownDocument is a wrapper around string that helps to generate valid MD file.
   /// The story must contain history (it has to be started first).
-  MarkdownDocument convertToMarkDown() {
-    MarkdownDocument doc = MarkdownDocument();
+  /// The [imagePrefix] argument should point to the root folder where all images are located.
+  MarkdownDocument convertToMarkDown(String imagePrefix) {
+    MarkdownDocument doc = MarkdownDocument(imagePrefix);
     doc.h1(title);
     doc.h2(description);
     doc.h2(authors);
@@ -266,15 +276,18 @@ class Story {
       doc.text(element.text);
       if (element.imagePath != null) {
         doc.separator();
-        doc.image(element.imagePath[0]);
+        // add black and white image if available
+        element.imagePath[1] == null
+            ? doc.image(element.imagePath[0])
+            : doc.image(element.imagePath[1]);
       }
     });
     return doc;
   }
 
   /// Converts Story into valid markdown string.
-  String toMarkdownString() {
-    return convertToMarkDown().toString();
+  String toMarkdownString(String imagePrefix) {
+    return convertToMarkDown(imagePrefix).toString();
   }
 
   dispose() {
@@ -344,6 +357,10 @@ class Page {
 
   PageNode getCurrentNode() {
     return nodes.elementAt(currentIndex);
+  }
+
+  List<String> getNextNodeTexts() {
+    return next.map<String>((next) => next.text).toList();
   }
 
   /// Returns true if there are more nodes.

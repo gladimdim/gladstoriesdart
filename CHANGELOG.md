@@ -1,3 +1,21 @@
+# 0.2.7
+- Added default image resolver **BackgroundImage**. By default it resolves all images to "images/background/..." path.
+- **toMarkdownString** method now expects you to provide a path to root folder were all your images are stored:
+```
+story.toMarkdownString("https://locadeserta.com/game/assets");
+```
+
+Images will be resolved if used standard BackgroundImage like this:
+```
+https://locadeserta.com/game/assets/images/background/landing/7.jpg
+```
+- Added **getNextNodeTexts** method that returns a list of available next options as texts.
+- Added **goToNextPageByText** method that finds PageNext by input text and goes to it.
+
+
+# 0.2.6
+Black and white images are used for markdown export.
+
 # 0.2.5
 - Added new API methods.
 - toJson method was refactored and now returns a Map<String, dynamic> instead of String.
