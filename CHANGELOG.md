@@ -1,3 +1,7 @@
+# 0.2.8
+
+Updated rxdart to latest version 0.25.0
+
 # 0.2.7
 - Added default image resolver **BackgroundImage**. By default it resolves all images to "images/background/..." path.
 - **toMarkdownString** method now expects you to provide a path to root folder were all your images are stored:
