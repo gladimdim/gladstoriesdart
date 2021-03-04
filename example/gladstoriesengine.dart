@@ -33,6 +33,7 @@ void main() {
     description: "Test Description",
     year: 1648,
     root: rootPage,
+    currentPage: rootPage
   );
 
   // check that story can continue

@@ -5,10 +5,10 @@ homepage: https://github.com/gladimdim/gladstoriesdart
 version: 0.2.8
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  rxdart: ^0.25.0
+  rxdart: ^0.26.0
 
 dev_dependencies:
   test: ^1.15.0

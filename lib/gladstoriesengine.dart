@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:gladstoriesengine/background_image.dart';
 import 'package:gladstoriesengine/markdown_generator.dart';
 import 'package:rxdart/rxdart.dart';
+// import 'package:rxdart/rxdart.dart';
 
 /// Contains supported by the Loca Deserta Image Types of the Page Nodes.
 enum ImageType { BOAT, STEPPE, FOREST, BULRUSH, RIVER, LANDING, CAMP, COSSACKS }
@@ -22,7 +23,7 @@ abstract class HistoryImage {
 }
 
 /// Used to resolve the ImageType to the real path on the device to the image
-typedef ImageResolver = HistoryImage Function(ImageType type);
+typedef ImageResolver = HistoryImage? Function(ImageType type);
 
 /// The main class for the GladStoriesEngine.
 ///
@@ -50,7 +51,7 @@ class Story {
   /// List of the nodes and choices already done by the player.
   ///
   /// Usually contains just text but can also include nodes with images.
-  List<HistoryItem> history;
+  late List<HistoryItem> history = List.empty(growable: true);
 
   /// The current Page of the Story.
   ///
@@ -67,7 +68,7 @@ class Story {
 
   /// A reference to the function to transform ImageType from enum into real image paths on the device.
   /// By default the Story constructor will use BackgroundImage class included in this library.
-  ImageResolver imageResolver;
+  ImageResolver? imageResolver;
 
   final BehaviorSubject _streamHistory = BehaviorSubject<List<HistoryItem>>();
 
@@ -78,20 +79,18 @@ class Story {
   /// from the first page.
   /// This stream can be used by Flutter StreamBuilder widget to react to the Story changes.
   /// The stream contains all the necessary info to update and build the Story view.
-  Stream historyChanges;
+  Stream? historyChanges;
 
   Story(
-      {this.title,
-      this.description,
-      this.authors,
-      this.root,
-      this.currentPage,
-      this.history,
-      this.year,
+      {required this.title,
+      required this.description,
+      required this.authors,
+      required this.root,
+      required this.currentPage,
+      List<HistoryItem>? existingHistory,
+      required this.year,
       this.imageResolver}) {
-    root ??= Page(nodes: []);
-    currentPage ??= root;
-    history ??= [];
+    history = existingHistory ?? List.empty(growable: true);
     imageResolver ??= BackgroundImage.getRandomImageForType;
 
     historyChanges = _streamHistory.stream;
@@ -121,7 +120,7 @@ class Story {
       List<String> imagePaths = [];
       if (imageResolver != null) {
         var backgroundImage =
-            imageResolver(currentPage.getCurrentNode().imageType);
+            imageResolver!(currentPage.getCurrentNode().imageType!)!;
         imagePaths.add(backgroundImage.getImagePathColored());
         imagePaths.add(backgroundImage.getImagePath());
       }
@@ -162,12 +161,12 @@ class Story {
     history.add(
       HistoryItem(text: next.text),
     );
-    currentPage = next.nextPage;
+    currentPage = next.nextPage!;
     currentPage.currentIndex = 0;
     _logCurrentPassageToHistory();
   }
 
-  void goToNextPageByText(String optionText) {
+  void goToNextPageByText(String? optionText) {
     var nextPage =
         currentPage.next.firstWhere((element) => element.text == optionText);
     goToNextPage(nextPage);
@@ -208,13 +207,18 @@ class Story {
 
   /// Initializes the story from the input json.
   static Story fromJson(Map<String, dynamic> map,
-      {ImageResolver imageResolver}) {
+      {ImageResolver? imageResolver}) {
     var rootMap = map["root"] as Map<String, dynamic>;
     var rootPage = Page.fromMap(rootMap);
     var currentPageMap = map['currentPage'];
-    var currentPage =
-        currentPageMap == null ? null : Page.fromMap(map['currentPage']);
-    List historyList = map['history'];
+    var currentPage;
+    if (currentPageMap == null) {
+      currentPage = rootPage;
+    } else {
+      currentPage = Page.fromMap(currentPageMap);
+    }
+
+    List? historyList = map['history'];
     String authors = map["authors"];
     return Story(
       title: map['title'],
@@ -224,7 +228,7 @@ class Story {
       year: map['year'],
       currentPage: currentPage,
       imageResolver: imageResolver,
-      history: historyList == null
+      existingHistory: historyList == null
           ? []
           : historyList.map((item) => HistoryItem.fromMap(item)).toList(),
     );
@@ -232,12 +236,14 @@ class Story {
 
   /// Generates dummy story just to get started.
   static Story generate() {
+    var root = Page.generate();
     var story = Story(
       title: 'After the battle',
       description:
           'At the beginning of XVII century a confrontation flares up between Polish-Lithuanian Commonwealth and Ottoman Empire. As a result of a devastating defeat in the Battle of Cecora, a lot of noblemen, cossacks and soldiers perished or were captured by Turks and Tatars. A fate of a young cossack, wayfaring through the Wild FIelds in a desperate attempt to escape from captivity, depends on a reader of this interactive fiction. All challenges are equally hard: survive in a steppe, avoid the revenge of Tatars, win the trust of cossack fishermen and return home. But the time of the final battle that will change history is coming. Will the main character be able to participate in it and stay alive and where his life will go from there - only You know the answer.',
       authors: 'Konstantin Boytsov, Anastasiia Tsapenko',
-      root: Page.generate(),
+      root: root,
+      currentPage: root,
       year: 1620,
     );
     return story;
@@ -247,11 +253,11 @@ class Story {
   ///
   /// Does a tree breadth first search to find the parent of the page.
   /// This is used to be able to navigate in the page hierarchy.
-  Page findParentOfPage(Page page) {
-    var queue = Queue<Page>();
+  Page? findParentOfPage(Page page) {
+    var queue = Queue<Page?>();
     queue.add(root);
     while (queue.isNotEmpty) {
-      var p = queue.removeFirst();
+      var p = queue.removeFirst()!;
       if (p.next.where((pageNext) => pageNext.nextPage == page).length == 1) {
         return p;
       } else {
@@ -274,10 +280,10 @@ class Story {
     history.forEach((element) {
       doc.separator();
       doc.text(element.text);
-      if (element.imagePath != null) {
+      if (element.imagePath.isNotEmpty) {
         doc.separator();
         // add black and white image if available
-        element.imagePath[1] == null
+        element.imagePath.length == 1
             ? doc.image(element.imagePath[0])
             : doc.image(element.imagePath[1]);
       }
@@ -297,14 +303,14 @@ class Story {
 
 class HistoryItem {
   /// Text to be shown to the user.
-  final String text;
+  final String? text;
 
   /// Images to be shown to the user.
   ///
   /// Can be empty.
   final List<String> imagePath;
 
-  HistoryItem({this.text, this.imagePath});
+  HistoryItem({this.text, this.imagePath = const []});
 
   /// Used to serialize to the map for persisting data.
   Map toMap() {
@@ -315,12 +321,11 @@ class HistoryItem {
   }
 
   static HistoryItem fromMap(Map map) {
-    List listFromMap = map['imagePath'] as List;
-    List<String> imagePaths = listFromMap == null
-        ? null
-        : listFromMap.map((item) => "$item").toList();
+    List? listFromMap = map['imagePath'] as List?;
+    List<String>? imagePaths =
+        listFromMap == null ? [] : listFromMap.map((item) => "$item").toList();
     return HistoryItem(
-      text: map['text'] as String,
+      text: map['text'] as String?,
       imagePath: imagePaths,
     );
   }
@@ -336,7 +341,7 @@ class Page {
   int currentIndex;
 
   /// The reference to the Page from which user can get to this page.
-  Page parent;
+  Page? parent;
 
   /// List of next choices which are shown to user.
   ///
@@ -344,23 +349,20 @@ class Page {
   List<PageNext> next;
 
   /// Is not null if the Page is the end of the story.
-  EndType endType;
+  EndType? endType;
 
-  Page({this.nodes, this.currentIndex = 0, this.next, this.endType}) {
-    if (next == null) {
-      next = List();
-    }
-    if (nodes == null) {
-      nodes = List();
-    }
-  }
+  Page(
+      {this.nodes = const [],
+      this.currentIndex = 0,
+      this.next = const [],
+      this.endType});
 
   PageNode getCurrentNode() {
     return nodes.elementAt(currentIndex);
   }
 
-  List<String> getNextNodeTexts() {
-    return next.map<String>((next) => next.text).toList();
+  List<String?> getNextNodeTexts() {
+    return next.map<String?>((next) => next.text).toList();
   }
 
   /// Returns true if there are more nodes.
@@ -374,7 +376,7 @@ class Page {
   }
 
   /// Returns text of the current node.
-  String getCurrentText() {
+  String? getCurrentText() {
     return getCurrentNode().text;
   }
 
@@ -506,17 +508,17 @@ class Page {
   /// Used to deserialize from the map into Page instance.
   ///
   /// If the state was present, it will be restored too.
-  static Page fromMap(Map<String, dynamic> map) {
-    if (map.isEmpty || map == null) {
+  static Page fromMap(Map<String, dynamic>? map) {
+    if (map == null || map.isEmpty) {
       return Page();
     }
     List next = map['next'] as List;
     List parsedNext = next.map<PageNext>((n) => PageNext.fromMap(n)).toList();
     List nodes = map['nodes'] as List;
     List parsedNodes = nodes.map<PageNode>((n) => PageNode.fromMap(n)).toList();
-    int currentI = map['currentIndex'];
+    int? currentI = map['currentIndex'];
     return Page(
-      next: parsedNext,
+      next: parsedNext as List<PageNext>,
       endType: endTypeFromString(map['endType']),
       nodes: parsedNodes as List<PageNode>,
       currentIndex: currentI == null ? 0 : currentI,
@@ -549,8 +551,8 @@ class Page {
 }
 
 class PageNext {
-  String text;
-  Page nextPage;
+  String? text;
+  Page? nextPage;
 
   PageNext({this.text, this.nextPage});
 
@@ -561,14 +563,14 @@ class PageNext {
   Map<String, dynamic> toMap() {
     return {
       'text': text,
-      'nextPage': nextPage.toMap(),
+      'nextPage': nextPage!.toMap(),
     };
   }
 }
 
 enum EndType { DEAD, ALIVE }
 
-String endTypeToString(EndType endType) {
+String? endTypeToString(EndType? endType) {
   switch (endType) {
     case EndType.ALIVE:
       return 'ALIVE';
@@ -579,7 +581,7 @@ String endTypeToString(EndType endType) {
   }
 }
 
-EndType endTypeFromString(String input) {
+EndType? endTypeFromString(String? input) {
   switch (input) {
     case 'ALIVE':
       return EndType.ALIVE;
@@ -591,8 +593,8 @@ EndType endTypeFromString(String input) {
 }
 
 class PageNode {
-  ImageType imageType;
-  String text;
+  ImageType? imageType;
+  String? text;
 
   PageNode({this.imageType, this.text});
 
@@ -619,7 +621,7 @@ class PageNode {
   }
 }
 
-ImageType imageTypeFromString(String input) {
+ImageType? imageTypeFromString(String? input) {
   switch (input) {
     case 'forest':
       return ImageType.FOREST;
@@ -640,7 +642,7 @@ ImageType imageTypeFromString(String input) {
   }
 }
 
-String imageTypeToString(ImageType imageType) {
+String? imageTypeToString(ImageType? imageType) {
   switch (imageType) {
     case ImageType.FOREST:
       return "forest";

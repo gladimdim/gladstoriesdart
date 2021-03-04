@@ -30,7 +30,7 @@ class MarkdownDocument {
   }
 
   MarkdownDocument image(String imagePath,
-      [String imageText, bool showText = false]) {
+      [String? imageText, bool showText = false]) {
     imageText = imageText ?? '';
     _document = _document + '![${imageText}]($imagePrefix/${imagePath})';
     if (showText) {
@@ -46,7 +46,7 @@ class MarkdownDocument {
     return this;
   }
 
-  MarkdownDocument text(String value) {
+  MarkdownDocument text(String? value) {
     _document = _document + '${value}\n';
     return this;
   }
