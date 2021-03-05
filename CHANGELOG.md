@@ -1,3 +1,7 @@
+# 0.3.0
+Null safety enabled.
+Story constructor expeects currentPage to be not null. You can use the same Page reference as for root property.
+
 # 0.2.8
 
 Updated rxdart to latest version 0.25.0
