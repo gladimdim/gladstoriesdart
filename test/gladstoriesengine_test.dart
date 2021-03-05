@@ -23,7 +23,6 @@ void main() {
       '{"title":"After the Battle","description":"At the beginning of the XVII century...","authors":"Dmytro Gladkyi, Someone else","year":1648,"root":{"endType":null,"nodes":[{"text":"Dmytro lay hidden in the thicket far from the water","imageType":"river"},{"text":"The Cossack lay like this for a long time."}],"next":[{"text":"Shoot the rifle","nextPage":{}},{"text":"Run away","nextPage":{}}]}}';
   var gladStory = jsonDecode(gladStoryString);
   group("Can be initialized from json", () {
-
     var story = Story.fromJson(gladStory, imageResolver: getRandomImage);
 
     test("Inits the title", () {
@@ -51,8 +50,8 @@ void main() {
         description: "Test Description",
         year: 1648,
         imageResolver: getRandomImage,
-        currentPage: Page(),
-        root: Page());
+        currentPage: Page.empty(),
+        root: Page.empty());
 
     test("Inits the title", () {
       expect(story.title, equals("Title"));
@@ -82,8 +81,10 @@ void main() {
       description: "Test Description",
       year: 1648,
       imageResolver: getRandomImage,
-      root: Page(nodes: [PageNode(text: "Test")]),
-      currentPage: Page(nodes: [PageNode(text: "Test")]),
+      root: Page(
+          nodes: [PageNode(text: "Test")], next: List.empty(growable: true)),
+      currentPage: Page(
+          nodes: [PageNode(text: "Test")], next: List.empty(growable: true)),
     );
 
     test("Inits with non-empty history array if page is not empty", () {
@@ -102,8 +103,9 @@ void main() {
       description: "Test Description",
       year: 1648,
       imageResolver: getRandomImage,
-      root: Page(nodes: [PageNode(text: "Test")]),
-      currentPage: Page(),
+      root: Page(
+          nodes: [PageNode(text: "Test")], next: List.empty(growable: true)),
+      currentPage: Page.empty(),
       existingHistory: [HistoryItem(imagePath: [], text: "Test Node")],
     );
 
@@ -122,19 +124,15 @@ void main() {
       next: [
         PageNext(
           text: "Go to next page",
-          nextPage: Page(
-            nodes: [
-              PageNode(text: "inner node"),
-            ],
-          ),
+          nextPage: Page(nodes: [
+            PageNode(text: "inner node"),
+          ], next: List.empty(growable: true)),
         ),
         PageNext(
           text: "Go to second page",
-          nextPage: Page(
-            nodes: [
-              PageNode(text: "second page"),
-            ],
-          ),
+          nextPage: Page(nodes: [
+            PageNode(text: "second page"),
+          ], next: List.empty(growable: true)),
         ),
       ],
     );
@@ -239,7 +237,7 @@ void main() {
     ], next: [
       PageNext(
         text: "Next Options",
-        nextPage: Page(),
+        nextPage: Page.empty(),
       ),
     ]);
 

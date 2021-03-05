@@ -21,6 +21,7 @@ void main() {
             PageNode(text: "inner node"),
           ],
           endType: EndType.ALIVE,
+          next: List.empty(growable: true),
         ),
       ),
     ],
@@ -28,13 +29,12 @@ void main() {
 
 // initialize Story with the root page and other meta data
   var story = Story(
-    authors: "Authors",
-    title: "Title",
-    description: "Test Description",
-    year: 1648,
-    root: rootPage,
-    currentPage: rootPage
-  );
+      authors: "Authors",
+      title: "Title",
+      description: "Test Description",
+      year: 1648,
+      root: rootPage,
+      currentPage: rootPage);
 
   // check that story can continue
   story.canContinue(); // returns true

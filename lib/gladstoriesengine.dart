@@ -335,10 +335,10 @@ class Page {
   /// List of the passages of the page.
   ///
   /// Player has to press "Continue" button in order to jump to the next node on the page.
-  List<PageNode> nodes;
+  late List<PageNode> nodes;
 
   /// Pointer to the current node.
-  int currentIndex;
+  late int currentIndex;
 
   /// The reference to the Page from which user can get to this page.
   Page? parent;
@@ -346,16 +346,22 @@ class Page {
   /// List of next choices which are shown to user.
   ///
   /// Contains the text + reference to the next page.
-  List<PageNext> next;
+  late List<PageNext> next;
 
   /// Is not null if the Page is the end of the story.
   EndType? endType;
 
   Page(
-      {this.nodes = const [],
+      {required this.nodes,
       this.currentIndex = 0,
-      this.next = const [],
+      required this.next,
       this.endType});
+
+  Page.empty() {
+    nodes = List.empty(growable: true);
+    next = List.empty(growable: true);
+    currentIndex = 0;
+  }
 
   PageNode getCurrentNode() {
     return nodes.elementAt(currentIndex);
@@ -460,7 +466,8 @@ class Page {
 
   /// Used by the Editor to add choice with next page.
   void addNextPageWithText(String text) {
-    var page = Page();
+    var page = Page(
+        nodes: List.empty(growable: true), next: List.empty(growable: true));
     next.add(PageNext(text: text, nextPage: page));
   }
 
@@ -510,7 +517,8 @@ class Page {
   /// If the state was present, it will be restored too.
   static Page fromMap(Map<String, dynamic>? map) {
     if (map == null || map.isEmpty) {
-      return Page();
+      return Page(
+          nodes: List.empty(growable: true), next: List.empty(growable: true));
     }
     List next = map['next'] as List;
     List parsedNext = next.map<PageNext>((n) => PageNext.fromMap(n)).toList();
@@ -540,11 +548,11 @@ class Page {
         next: [
           PageNext(
             text: 'Option 1',
-            nextPage: Page(),
+            nextPage: Page.empty(),
           ),
           PageNext(
             text: 'Option 2',
-            nextPage: Page(),
+            nextPage: Page.empty(),
           )
         ]);
   }
