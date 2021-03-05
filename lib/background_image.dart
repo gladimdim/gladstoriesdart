@@ -20,24 +20,24 @@ class BackgroundImage {
     ImageType.COSSACKS: RandomImage(ImageType.CAMP), // shadowed
   };
 
-  static RandomImage getRandomImageForType(ImageType type) {
+  static RandomImage? getRandomImageForType(ImageType type) {
     return _images[type];
   }
 
   static void nextRandomForType(ImageType type) {
-    return _images[type].nextRandom();
+    return _images[type]!.nextRandom();
   }
 
   static void resetRandomForType(ImageType type) {
-    return _images[type].resetUsedRandomNumbers();
+    return _images[type]!.resetUsedRandomNumbers();
   }
 }
 
 class RandomImage implements HistoryImage {
   Random _random = Random();
-  int _currentRandom;
-  int _max;
-  List<int> _usedRandomNumbers;
+  int? _currentRandom;
+  int? _max;
+  late List<int?> _usedRandomNumbers;
   final ImageType type;
 
   Map<ImageType, String> _imagePrefix = {
@@ -72,11 +72,10 @@ class RandomImage implements HistoryImage {
         _max = 15;
         break;
       default:
-        throw "Not implemented";
-        break;
+        throw "Type ${this.type} was not recognized by RandomImage";
     }
 
-    _currentRandom = _random.nextInt(_max);
+    _currentRandom = _random.nextInt(_max!);
     _usedRandomNumbers = [_currentRandom];
   }
 
@@ -92,7 +91,7 @@ class RandomImage implements HistoryImage {
     if (_usedRandomNumbers.length == _max) {
       _usedRandomNumbers = [];
     }
-    var temp = _random.nextInt(_max);
+    var temp = _random.nextInt(_max!);
     if (_usedRandomNumbers.indexOf(temp) >= 0) {
       nextRandom();
       return;

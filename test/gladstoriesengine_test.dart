@@ -17,29 +17,21 @@ class TestImage extends HistoryImage {
 
 var image = TestImage();
 HistoryImage getRandomImage(ImageType type) => image;
+
 void main() {
   var gladStoryString =
       '{"title":"After the Battle","description":"At the beginning of the XVII century...","authors":"Dmytro Gladkyi, Someone else","year":1648,"root":{"endType":null,"nodes":[{"text":"Dmytro lay hidden in the thicket far from the water","imageType":"river"},{"text":"The Cossack lay like this for a long time."}],"next":[{"text":"Shoot the rifle","nextPage":{}},{"text":"Run away","nextPage":{}}]}}';
   var gladStory = jsonDecode(gladStoryString);
   group("Can be initialized from json", () {
+
     var story = Story.fromJson(gladStory, imageResolver: getRandomImage);
+
     test("Inits the title", () {
       expect(story.title, equals("After the Battle"));
     });
 
-    test("Can init without parameters", () {
-      var story = Story(imageResolver: getRandomImage);
-      expect(story.currentPage, isNotNull);
-      expect(story.root, isNotNull);
-    });
-    test("Inits the description", () {
-      expect(story.description != null, isTrue);
-    });
-    test("Inits the root page", () {
-      expect(story.root != null, isTrue);
-    });
     test("Inits the current page", () {
-      expect(story.root, equals(story.currentPage));
+      expect(identical(story.currentPage, story.root), isTrue);
     });
     test("Inits the history list", () {
       expect(story.history.length, equals(1));
@@ -59,6 +51,7 @@ void main() {
         description: "Test Description",
         year: 1648,
         imageResolver: getRandomImage,
+        currentPage: Page(),
         root: Page());
 
     test("Inits the title", () {
@@ -68,11 +61,9 @@ void main() {
       expect(story.description, equals("Test Description"));
     });
     test("Inits the root page", () {
-      expect(story.root != null, isTrue);
+      expect(story.root, isNotNull);
     });
-    test("Inits the current page page", () {
-      expect(story.root, equals(story.currentPage));
-    });
+
     test("Inits the history list with an empty list as root is empty Page", () {
       expect(story.history.length, equals(0));
     });
@@ -92,7 +83,7 @@ void main() {
       year: 1648,
       imageResolver: getRandomImage,
       root: Page(nodes: [PageNode(text: "Test")]),
-      // history: [HistoryItem(imagePath: [], text: "Test")],
+      currentPage: Page(nodes: [PageNode(text: "Test")]),
     );
 
     test("Inits with non-empty history array if page is not empty", () {
@@ -112,7 +103,8 @@ void main() {
       year: 1648,
       imageResolver: getRandomImage,
       root: Page(nodes: [PageNode(text: "Test")]),
-      history: [HistoryItem(imagePath: [], text: "Test Node")],
+      currentPage: Page(),
+      existingHistory: [HistoryItem(imagePath: [], text: "Test Node")],
     );
 
     test("Inits with history argument if it is present", () {
@@ -125,33 +117,35 @@ void main() {
   });
 
   group("Story API. ", () {
+    var root = Page(
+      nodes: [PageNode(text: "Test"), PageNode(text: "Second")],
+      next: [
+        PageNext(
+          text: "Go to next page",
+          nextPage: Page(
+            nodes: [
+              PageNode(text: "inner node"),
+            ],
+          ),
+        ),
+        PageNext(
+          text: "Go to second page",
+          nextPage: Page(
+            nodes: [
+              PageNode(text: "second page"),
+            ],
+          ),
+        ),
+      ],
+    );
     var story = Story(
       authors: "Authors",
       title: "Title",
       description: "Test Description",
       year: 1648,
-      root: Page(
-        nodes: [PageNode(text: "Test"), PageNode(text: "Second")],
-        next: [
-          PageNext(
-            text: "Go to next page",
-            nextPage: Page(
-              nodes: [
-                PageNode(text: "inner node"),
-              ],
-            ),
-          ),
-          PageNext(
-            text: "Go to second page",
-            nextPage: Page(
-              nodes: [
-                PageNode(text: "second page"),
-              ],
-            ),
-          ),
-        ],
-      ),
-      history: [HistoryItem(imagePath: [], text: "Test Node")],
+      root: root,
+      currentPage: root,
+      existingHistory: [HistoryItem(imagePath: [], text: "Test Node")],
       imageResolver: getRandomImage,
     );
 
