@@ -1,3 +1,21 @@
+# 0.3.1
+
+- Page() constructor requires nodes and next properties.
+If you want to create an empty Page with empty nodes and next then use Page.empty() constructor.
+
+Before:
+```
+var page = Page();
+```
+
+After:
+```
+var page = Page.empty();
+```
+
+- Added types for Stream historyChanges
+
+
 # 0.3.0
 Null safety enabled.
 Story constructor expeects currentPage to be not null. You can use the same Page reference as for root property.
