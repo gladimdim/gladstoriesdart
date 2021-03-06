@@ -70,7 +70,7 @@ class Story {
   /// By default the Story constructor will use BackgroundImage class included in this library.
   ImageResolver? imageResolver;
 
-  final BehaviorSubject _streamHistory = BehaviorSubject<List<HistoryItem>>();
+  final BehaviorSubject<List<HistoryItem>> _streamHistory = BehaviorSubject();
 
   /// A stream with the full list of history.
   ///
@@ -79,7 +79,7 @@ class Story {
   /// from the first page.
   /// This stream can be used by Flutter StreamBuilder widget to react to the Story changes.
   /// The stream contains all the necessary info to update and build the Story view.
-  Stream? historyChanges;
+  late Stream<List<HistoryItem>> historyChanges;
 
   Story(
       {required this.title,
@@ -651,6 +651,9 @@ ImageType? imageTypeFromString(String? input) {
 }
 
 String? imageTypeToString(ImageType? imageType) {
+  if (imageType == null) {
+    return null;
+  }
   switch (imageType) {
     case ImageType.FOREST:
       return "forest";
@@ -668,8 +671,6 @@ String? imageTypeToString(ImageType? imageType) {
       return 'landing';
     case ImageType.STEPPE:
       return 'steppe';
-    default:
-      return null;
   }
 }
 
