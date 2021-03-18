@@ -113,14 +113,14 @@ class Story {
   }
 
   void _logCurrentPassageToHistory() {
-    if (currentPage.nodes.isEmpty) {
+    var current = currentPage.getCurrentNode();
+    if (currentPage.nodes.isEmpty || current == null) {
       return;
     }
-    if (currentPage.getCurrentNode().imageType != null) {
+    if (current.imageType != null) {
       List<String> imagePaths = [];
       if (imageResolver != null) {
-        var backgroundImage =
-            imageResolver!(currentPage.getCurrentNode().imageType!)!;
+        var backgroundImage = imageResolver!(current.imageType!)!;
         imagePaths.add(backgroundImage.getImagePathColored());
         imagePaths.add(backgroundImage.getImagePath());
       }
@@ -363,8 +363,12 @@ class Page {
     currentIndex = 0;
   }
 
-  PageNode getCurrentNode() {
-    return nodes.elementAt(currentIndex);
+  PageNode? getCurrentNode() {
+    try {
+      return nodes.elementAt(currentIndex);
+    } catch (e) {
+      return null;
+    }
   }
 
   List<String?> getNextNodeTexts() {
@@ -383,7 +387,7 @@ class Page {
 
   /// Returns text of the current node.
   String? getCurrentText() {
-    return getCurrentNode().text;
+    return getCurrentNode()?.text;
   }
 
   /// Add a new node (paragraph) to the current page.

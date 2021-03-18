@@ -1,3 +1,6 @@
+# 0.3.2
+- getCurrentNode now returns String? instead of String. This was changed due to possibility to throw an exception when the nodes array is accessed by the index. By default index is init with 0, but nodes array can be empty. If getCurrentNode() is called then it should return null (String?).
+
 # 0.3.1
 
 - Page() constructor requires nodes and next properties.

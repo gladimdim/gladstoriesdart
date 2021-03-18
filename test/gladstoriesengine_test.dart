@@ -242,7 +242,7 @@ void main() {
     ]);
 
     test("Can get current node", () {
-      expect(page.getCurrentNode().text, equals("First"));
+      expect(page.getCurrentNode()!.text, equals("First"));
     });
 
     test("Can get current text from the current node", () {
